@@ -1,0 +1,44 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    ingress.kubernetes.io/rewrite-target: /
+    kubernetes.io/ingress.global-static-ip-name: futurebank
+    kubernetes.io/ingress.class: "gce"
+  name: ingress
+  namespace: default
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          serviceName: front-end-service
+          servicePort: 80
+        path: /
+      paths:
+      - backend:
+          serviceName: front-end-service
+          servicePort: 80
+        path: /* 
+      - backend:
+          serviceName: fileserver-service
+          servicePort: 3000
+        path: /api
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: front-end
+  name: front-end-service
+  namespace: default
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: front-end
+  type: NodePort
+
+

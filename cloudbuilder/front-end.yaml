@@ -1,0 +1,23 @@
+steps:
+# Build New Front-end Container
+- name: 'gcr.io/cloud-builders/docker'
+  args: [ 'build', '-t', 'gcr.io/$PROJECT_ID/front-end-image', './front-end' ]
+
+# Push updated Front-end Container
+- id: 'Push Front-end image to registry'
+  name: 'gcr.io/cloud-builders/docker'
+  args: [ 'push', 'gcr.io/$PROJECT_ID/front-end-image' ]
+
+# Delete Existing Deployment 
+- name: 'gcr.io/cloud-builders/kubectl'
+  args: [ 'delete', 'deployment', 'front-end' ]
+  env:
+    - 'CLOUDSDK_COMPUTE_ZONE=europe-west1-c'
+    - 'CLOUDSDK_CONTAINER_CLUSTER=futurebank'
+
+# Deploy all in the Cloud
+- name: 'gcr.io/cloud-builders/kubectl'
+  args: [ 'apply', '-f', 'cloudbuilder/front-end-deployment.yaml' ]
+  env:
+    - 'CLOUDSDK_COMPUTE_ZONE=europe-west1-c'
+    - 'CLOUDSDK_CONTAINER_CLUSTER=futurebank'
